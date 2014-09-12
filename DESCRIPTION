@@ -1,0 +1,12 @@
+Package: eatlessmeat
+Type: Package
+Title: Eat less meat, save water?
+Version: 1.0
+Date: 2014-09-10
+Author: Joseph Guillaume, based on work by Mika Jalava et al.
+Maintainer: Joseph Guillaume <joseph.guillaume@gmail.com>
+Description: Water footprint analysis of effect of eating less meat 
+License: GPL-3
+Depends: quadprog
+Suggests: testthat
+LazyData: TRUE
