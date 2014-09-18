@@ -155,3 +155,26 @@ test_that("meat percentagess of solutions match",{
   expect_that(getMeatPerc(sol3,current_diet,current_prot),equals(getMeatPerc(matlab.sol.s3,current_diet,current_prot),tolerance=1e-7))
   expect_that(getMeatPerc(sol4,current_diet,current_prot),equals(getMeatPerc(matlab.sol.s4,current_diet,current_prot)))
 })
+
+test_that("solutions match as returned by jalava_scenarios",{
+  diets <- jalava_scenarios(current_diet,current_kcal,current_prot,current_fat,ader,use.names=FALSE)
+  expect_that(diets[,1],equals(matlab.sol.s1,tolerance=5e-5))
+  expect_that(diets[,2],equals(matlab.sol.s2,tolerance=6e-5))
+  expect_that(diets[,3],equals(matlab.sol.s3,tolerance=5e-5))
+  expect_that(diets[,4],equals(matlab.sol.s4,tolerance=5e-5))
+})
+
+test_that("constrain_diet gives same result with specified prot,fat,k ",{
+  sol1 <- constrain_diet(current_diet,current_kcal,current_prot,current_fat,ader,
+                        meatprodprotub=1,meatprotub=1)
+  
+  prot <- ifelse(current_diet>0,current_prot/current_diet,0) #g/g
+  k <- ifelse(current_diet>0,current_kcal/current_diet,0) #kcal/g
+  fat <- ifelse(current_diet>0,current_fat/current_diet,0) #g/g
+  
+  sol2 <- constrain_diet(current_diet,ader=ader,
+                         meatprodprotub=1,meatprotub=1,
+                         prot=prot,k=k,fat=fat)
+  
+  expect_that(sol1,is_identical_to(sol2))
+})
