@@ -10,12 +10,13 @@ constrain_diet <- function(current_diet,current_kcal,current_prot,current_fat,
                           ## Max protein % from meat
                           meatprotub=1,
                           start=current_diet,
+                          prot,k,fat,
                           return.state=NULL
                           ){
   
-  prot <- ifelse(current_diet>0,current_prot/current_diet,0) #g/g
-  k <- ifelse(current_diet>0,current_kcal/current_diet,0) #kcal/g
-  fat <- ifelse(current_diet>0,current_fat/current_diet,0) #g/g
+  if(missing(prot)) prot <- ifelse(current_diet>0,current_prot/current_diet,0) #g/g
+  if(missing(k)) k <- ifelse(current_diet>0,current_kcal/current_diet,0) #kcal/g
+  if(missing(fat)) fat <- ifelse(current_diet>0,current_fat/current_diet,0) #g/g
   
 
   
