@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Eat less meat, save water?</title>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<!-- <script type="text/javascript" src="js/jquery.min.js"></script> -->
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript" src="js/underscore.1.6.0.min.js"></script>
+	<script type="text/javascript" src="js/backbone.1.1.2.min.js"></script>
+	<script type="text/javascript" src="js/opencpu-0.5.js"></script>
+	<script type="text/javascript" src="js/data.js"></script>
+	<script type="text/javascript" src="js/models.js"></script>
+
+	<style>
+	.barplot {height:400px}
+
+	.spacer {
+		margin-top: 20px;
+	}
+	
+	.rplot_carousel {
+		margin-left:7%;
+		margin-right:7%;
+		margin-bottom:10%;
+	}
+	
+	.carousel-control.left,.carousel-control.right {
+		opacity: 1;
+		filter: alpha(opacity=100);
+		background-image: none;
+		background-repeat: no-repeat;
+		text-shadow: none;
+	}
+	
+	.carousel-control.left span, .carousel-control.right span {
+		color: grey;
+	}
+	
+	.carousel-indicators li {
+		border: 1px solid grey;
+	}
+	
+	.carousel-indicators .active {
+		background-color: grey;
+	}
+	</style>
+
+</head>
+<body>
+
+<p id="choose_country" class="navbar-text navbar-right"></p>
+
+<div class=container role=main>
+
+	<div class="page-header">
+	<h1>If I eat less meat, will I save water?</h1>
+	<!-- Alternative framing/wording:
+	Should I eat less meat? <br/>
+	If I eat less meat, will I save water?<br/>
+	If I eat less meat, will I reduce water scarcity?
+	-->
+	</div>
+
+	<div class="row">
+
+		<div id="jalava_carousel" class="carousel col-md-8" data-ride="carousel" data-interval='false'>
+			 <!-- Indicators -->
+			<ol class="carousel-indicators">
+				<li data-target="#jalava_carousel" data-slide-to="0" class="active"></li>
+				<li data-target="#jalava_carousel" data-slide-to="1"></li>
+				<li data-target="#jalava_carousel" data-slide-to="2"></li>
+				<li data-target="#jalava_carousel" data-slide-to="3"></li>
+				<li data-target="#jalava_carousel" data-slide-to="4"></li>
+			</ol>
+			
+			<!-- Wrapper for slides -->
+			<div class="carousel-inner">		
+				<div id="bp_jalava_fp" class="barplot item active rplot_carousel"></div>
+				<div id="bp_jalava" class="item barplot rplot_carousel"></div>
+				<div id="bp_jalava_prot" class="item barplot  rplot_carousel"></div>
+				<div id="bp_jalava_fat" class="item barplot  rplot_carousel"></div>
+				<div id="bp_jalava_kcal" class="item barplot  rplot_carousel"></div>
+			</div>
+			
+			<!-- Controls -->
+			<a class="left carousel-control" href="#jalava_carousel" role="button" data-slide="prev">
+				<span class="glyphicon glyphicon-chevron-left"></span>
+			</a>
+			<a class="right carousel-control" href="#jalava_carousel" role="button" data-slide="next">
+				<span class="glyphicon glyphicon-chevron-right"></span>
+			</a> 
+		</div>
+		
+		<ul>
+		<li>Scenario 1: meet recommended dietary requirements</li>
+		<li>Scenario 2: max 50% protein from meat products, 16.7% protein from meat</li>
+		<li>Scenario 3: max 25% protein from meat products, 8.3% protein from meat</li>
+		<li>Scenario 4: max 12.5% protein from meat products, 4.17% protein from meat</li>
+		</ul>
+		
+		<!-- TODO: some kind of text summary
+		Yes/No</br>
+		<li>Will save x blue (pumped) and y green water (directly used by agriculture).</li>
+		<li>Would shift from blue to green</li>
+		-->
+
+		<!--
+		<div id=fp_display>
+		Current diet water footprint:<br/>
+		Green: <span class="green"></span> ML/cap/year<br/>
+		Blue: <span class="blue"></span> ML/cap/year
+		</div>
+		-->
+
+	</div>
+
+	<div class="page-header">
+	<h2>Where does this answer come from?</h2>
+	<!-- 
+	Disagree? Want to see where the answer comes from? 
+	explanation and disclaimer
+	-->
+	</div>
+
+	<div id="explanation" class='row'>
+	<ul class="list-group">
+		<li class="list-group-item">Total water footprint of a diet is calculated from quantity of each food group consumed and the water footprint of each food group.
+			<!--sum(diet*footprint.per.gram) -->
+			<!-- TODO: should this be encapsulated in a new view? -->
+			(<a href='javascript:void(0)' onClick='$("#fp_container").toggleClass("hidden");bp_jalava_fpg.render();bp_jalava_fpb.render();'>Show/hide water footprints</a>)
+
+			<div id="fp_container" class='row hidden'>
+					<div id="bp_jalava_fpg" class="col-md-6 barplot"></div>
+					<div id="bp_jalava_fpb" class="col-md-6 barplot"></div>
+			</div>
+		</li>
+
+		<li class="list-group-item">
+			<div class=container>
+			<div class=row>
+			The effect of eating less meat is calculated by imposing limits on the diet and then finding a new diet that satisfies those limits while changing as little as possible. The water footprint is then recalculated.
+			(<a href='javascript:void(0)' onClick='$("#constraints_applied").toggleClass("hidden");'>Show/hide dietary requirements</a>)
+			</div>		
+			<!-- Current dietary requirements imposed:<p/> -->
+			<div id="constraints_applied" class="row spacer well hidden"></div>
+			</div>
+		</li>
+		<li class="list-group-item">The numbers used are only averages, its quite likely they don't really match any single individual.</li>
+		<li class="list-group-item">In fact, the result might change depending on a number of factors, which you can experiment with below </li>
+	</ul>
+	</div>
+
+	<div class="page-header">
+	<h2>Disagree? How can the answer change?</h2>
+	<!-- 
+	Why might the answer change?
+	How can the answer change?
+	-->
+	</div>
+
+	
+	
+	<div class='row panel-group' id='accordion'>
+
+	  <div class="panel panel-default" id="panel1">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<a data-toggle="collapse" data-target="#collapse1" href="#panel1">
+				1. Change the food group water footprints
+				</a>
+			</h3>
+		</div>
+		<div id="collapse1" class="panel-collapse collapse"><div class="panel-body">
+			Why would you want to change the food group footprints: 
+			<li>Water efficiency could be improved</li>
+			<!-- TODO: expand further -->
+			<li>Meat could be produced via irrigation vs. pasture</li>
+			<li>Food could be imported/exported from different countries</li>
+			
+			<br/>
+			Current food group water footprints ML/year/gram:
+			<div id="fpmatrix"><!--Per food group footprints --></div>
+		</div></div>
+	  </div>
+	  
+	  <div class="panel panel-default" id="panel2">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<a data-toggle="collapse" data-target="#collapse2" href="#panel2">
+				2. Change the current diet
+				</a>
+			</h3>
+		</div>
+		<div id="collapse2" class="panel-collapse collapse"><div class="panel-body">
+		
+			Why would you want to change the current diet: 
+			<li>Doesn't match what you actually eat</li>
+			<li>Diets vary substantially within countries</li>
+			<br/>
+			
+			The current diet is:<br/>
+			<div id="table_current_diet"></div>
+			
+			<div class=row><div id="bp_current_diet" class="col-md-8 barplot"></div></div>
+
+			<!--   Alternative displays:
+			Proportion of each - not really meaningful in kg terms
+
+			Plot of current diet - grams
+
+			Current & other % protein from meat, meat products
+
+			Percent of daily energy intake
+
+			Reset button
+			-->
+			
+			<div class="spacer">
+			The default diet is based on the FAOStat database of national food balance sheets provided by the United Nations Food and Agriculture Organization (FAO).
+			</div>
+
+		</div></div>
+	  </div>		
+
+	  <div class="panel panel-default" id="panel3">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<a data-toggle="collapse" data-target="#collapse3" href="#panel3">
+				3. Change requirements of the revised diet
+				</a>
+			</h3>
+		</div>
+		<div id="collapse3" class="panel-collapse collapse"><div class="panel-body">
+
+			Why would you want to change requirements of the revised diet?: 
+			<li>Change objectives to fit personal or cultural preferences</li>
+			<li>Nutritional requirements are known to vary per person</li>
+			<li>Nutritional requirements may be to some extent uncertain</li>
+			<br/>
+
+			Current dietary requirements imposed:<br/>
+			<div id="constraints_applied2" class="well"></div>
+			
+			<div class="spacer">
+			The recommended average dietary energy requirement (ADER) varies by country, ranging from 2053-2704 kcal/cap/day (source: FAO).
+			</div>
+			
+		</div></div>
+	  </div>		
+
+	  <div class="panel panel-default" id="panel31">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<a data-toggle="collapse" data-target="#collapse31" href="#panel31">
+				3.1 Change nutrition of each food group
+				</a>
+			</h3>
+		</div>
+		<div id="collapse31" class="panel-collapse collapse"><div class="panel-body">	
+			Why would you want to: 
+			<li>Changing quality of food product</li>
+			<li>better match local food properties</li>
+
+			<!-- % protein for each product<br/> -->
+			
+		</div></div>
+	  </div>
+
+	</div>
+  
+ <!--
+<div id="table_user_diet"></div>
+
+-->
+
+	<div class="page-header">
+	Information
+	</div>
+	
+	<p>Analysis based on Jalava, M, M Kummu, M Porkka, S Siebert, and O Varis. 2014. “Diet Change—a Solution to Reduce Water Use?” Environmental Research Letters 9 (7). IOP Publishing: 074016. doi:<a href="http://dx.doi.org/10.1088/1748-9326/9/7/074016">10.1088/1748-9326/9/7/074016</a>.
+	</p>
+		
+	<p>
+	Implemented with <a href="http://cran.r-project.org/">R</a>, <a href="http://opencpu.org">OpenCPU</a>, <a href="http://jquery.com/">jQuery</a> and <a href="http://getbootstrap.com/">Bootstrap</a>.
+	Code available at: <a href="https://github.com/josephguillaume/eatlessmeat">https://github.com/josephguillaume/eatlessmeat</a>
+	</p>
+	
+
+</div>
+
+
+<!-- ///////////////////////////////////////////////////////////// -->
+
+<script type="text/template" id="TableFPMatrix_template">
+	<form><table class="table table-striped">
+			<thead>
+			<th></th>
+<!-- TODO: click should show whats included -->
+			<th>beverages</th> 
+			<th>cereals</th> 
+			<th>eggs</th> 
+			<th>fish</th>
+			<th>fruits&vegs</th> 
+			<th>meat</th> 
+			<th>milk</th> 
+			<th>oil</th>
+			<th>oilseeds</th> 
+			<!--<th>other</th>  -->
+			<th>roots</th> 
+			<th>spices</th> 
+			<th>stimulants</th>
+			<th>sugar</th>
+			</thead>
+			<tbody>
+				<tr align="right">
+				<td>Blue water footprint</td>
+				<!-- ML/year/gram-->
+				<% _.each( fpm[0], function( cell ){ %>
+					<td align="right"><%- cell.toFixed(3) %></td>
+				<% }); %>
+				</tr>
+				<tr align="right">
+				<td>Green water footprint</td>
+				<% _.each( fpm[1], function( cell ){ %>
+					<td align="right"><%- cell.toFixed(3) %></td>
+				<% }); %>
+				</tr>
+				<tr align="right">
+				<td>Total water footprint</td>
+				<% _.each( add(fpm[0],fpm[1]), function( cell ){ %>
+					<td align="right"><%- cell.toFixed(3) %></td>
+				<% }); %>
+				</tr>
+			</tbody>
+	</table></form>
+</script>
+
+<script type="text/template" id="TableDiet_template">
+	<form><table class="table table-striped">
+			<thead>
+			<th></th>
+			<th>beverages</th> 
+			<th>cereals</th> 
+			<th>eggs</th> 
+			<th>fish</th>
+			<th>fruits&vegs</th> 
+			<th>meat</th> 
+			<th>milk</th> 
+			<th>oil</th>
+			<th>oilseeds</th> 
+			<!--<th>other</th>  -->
+			<th>roots</th> 
+			<th>spices</th> 
+			<th>stimulants</th>
+			<th>sugar</th>
+			<th>Total</th>
+			</thead>
+			<tbody>
+				<tr align="right">
+				<td>Grams per person per day</td>
+				<% _.each( diet, function( cell ){ %>
+					<td align="right"><%- cell.toFixed(2) %></td>
+				<% }); %>
+				<td><%- sum(diet).toFixed(2) %></td>
+				</tr>
+				
+				<tr align="right">
+				<td>Percentage of energy intake</td>
+				<% _.each( kcal_perc, function( cell ){ %>
+					<td align="right"><%- (cell*100).toFixed(2) %>%</td>
+				<% }); %>
+				<td><%- (sum(kcal_perc)*100).toFixed(2) %>%</td>
+				</tr>
+				
+				<tr align="right">
+				<td>Percentage of protein intake</td>
+				<% _.each( prot_perc, function( cell ,idx ){ %>
+					<td align="right" 
+						<% if (idx == 5 && cell>user_meatprotub) {%> style='color:red'<% } %>
+					><%- 
+					(cell*100).toFixed(2) %>%
+					</td>
+				<% }); %>
+				<td><%- (_.reduce(prot_perc, function(memo, num){ return memo + num; }, 0)*100).toFixed(2) %>%</td>
+				</tr>
+				
+								<tr align="right">
+				<td>Percentage of fat intake</td>
+				<% _.each( fat_perc, function( cell ,idx ){ %>
+					<td align="right"><%- (cell*100).toFixed(2) %>%
+					</td>
+				<% }); %>
+				<td><%- (_.reduce(fat_perc, function(memo, num){ return memo + num; }, 0)*100).toFixed(2) %>%</td>
+				</tr>
+			</tbody>
+	</table></form>
+	
+	<li>Energy intake is <span  <% if (kcal_total>ader) {%> style='color:red'<% } %>><%- kcal_total.toFixed(2) %></span> kcal/cap/day</li>
+	<li>Protein is <span <% if (kcal_prot/kcal_total<user_prot_perc[0] || user_prot_perc[1] < kcal_prot/kcal_total) {%>style='color:red'<% } %>>
+	<%- (kcal_prot/kcal_total*100).toFixed(2) %>%</span> of energy intake</li>
+	<li>Fat is <span <% if (kcal_fat/kcal_total<user_fat_perc[0] || user_fat_perc[1] < kcal_fat/kcal_total) {%>style='color:red'<% } %>>
+	<%- (kcal_fat/kcal_total*100).toFixed(2) %>%</span> of energy intake</li>
+	
+	<br/>
+</script>
+
+
+<script type="text/template" id="TableConstraints_template">
+   Nutrition constraints:
+   <li>Average dietary energy intake must be <b><%- ader %> kcal/cap/day</b>.</li>
+   <li>Protein intake must be between <b><%- user_prot_perc[0]*100 %>%</b> and <b><%- user_prot_perc[1]*100 %>%</b> of daily energy intake</li>
+   <li>Fat intake must be between <b><%- user_fat_perc[0]*100 %>%</b> and <b><%- user_fat_perc[1]*100 %>%</b> of daily energy intake</li>
+   <li>Vegetable intake is at least <b><%- user_vegmin %> grams per day</b> (this include vegetable, fruit and oilseeds)</li>
+   <li>Sugar intake should be less than 10% of of daily energy intake</li>
+   <br/>
+   Meat reduction:
+   <li>Meat makes up less than <b><%- user_meatprotub*100 %>%</b> of total protein intake</li>
+   <li>Meat products (eggs, meat, milk) make up less than <b><%- user_meatprodprotub*100 %>%</b> of total protein intake</li>
+   <br/>
+   Additional constraints in changing diet:
+   <li>Beverages, spices and stimulants should not increase</li>
+   <li>Fish should not increase</li>
+</script>
+
+<script type="text/template" id="SelectCountry_template">
+Country: <select>
+    <% _.each( countries, function( country ){ %>
+		<option value="<%- country%>"><%- country %></option>
+	<% }); %>
+</select>
+</script>
+
+<script type="text/javascript">
+
+$(function(){
+
+gc = new GlobalContext();
+ld = new LocalData({gc:gc});
+
+select_country = new SelectCountry({model:gc,el:$("#choose_country")});
+
+
+//fp = new Footprint({model:ld,el:$("#fp_display")});
+tfpm = new TableFPMatrix({model:ld,el:$("#fpmatrix")});
+
+tcurrentdiet = new TableDiet({model:ld,el:$("#table_current_diet"),diet:'current_diet'});
+
+tuserdiet = new TableDiet({model:ld,el:$("#table_user_diet"),diet:'user_constrained_diet'});
+
+constr = new TableConstraints({model:ld,el:$("#constraints_applied")});
+constr2 = new TableConstraints({model:ld,el:$("#constraints_applied2")});
+
+//cc = new DropdownCountry({model:gc,el:$("#choose_country")});
+
+bp_food= new BarplotProducts({model:ld,el:$("#bp_current_diet"),height:'current_diet',main:'Food supply for current diet (g/cap/day)'});
+$("#collapse2").on('shown.bs.collapse',function(x){bp_food.render();});
+
+scen_names=['Current','Scen 1','Scen 2','Scen 3','Scen 4'];
+jalava_plots={
+	bp_jalava_fp: new BarplotFootprint({model:ld,el:$("#bp_jalava_fp")}),
+	bp_jalava: new BarplotProducts({model:ld,el:$("#bp_jalava"),height:'jalava_scens',main:'Food supply for each scenario (g/cap/day)',legend_text:scen_names}),
+	bp_jalava_prot: new BarplotProducts({model:ld,el:$("#bp_jalava_prot"),height:'jalava_scens_prot',main:'Protein for each scenario (g/cap/day)',legend_text:scen_names}),
+	bp_jalava_fat: new BarplotProducts({model:ld,el:$("#bp_jalava_fat"),height:'jalava_scens_fat',main:'Fat for each scenario (g/cap/day)',legend_text:scen_names}),
+	bp_jalava_kcal: new BarplotProducts({model:ld,el:$("#bp_jalava_kcal"),height:'jalava_scens_kcal',main:'Energy for each scenario (kcal/cap/day)',legend_text:scen_names}),
+};
+$("#jalava_carousel").on('slid.bs.carousel',function(ev){jalava_plots[ev.relatedTarget.id].render()});
+
+bp_jalava_fpg= new BarplotProducts({model:ld,el:$("#bp_jalava_fpg"),height:'jalava_scens_fpg',main:'Green water footprints (ML/year)'});
+bp_jalava_fpb= new BarplotProducts({model:ld,el:$("#bp_jalava_fpb"),height:'jalava_scens_fpb',main:'Blue water footprints (ML/year)'});
+
+
+
+});
+
+</script>
+
+</body>
+</html>
