@@ -322,7 +322,7 @@ var BarplotProducts = Backbone.View.extend({
 		this.height=args.height;
 		this.main=args.main;
 		this.legend_text=args.legend_text;
-		this.listenTo(this.model,'change:'+this.height,this.refresh,this);
+		this.listenTo(this.model,'change:'+this.height,this.actual_render,this);
 		this.actual_render();
 	},
 	render:function(){
