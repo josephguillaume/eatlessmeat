@@ -36,6 +36,7 @@ var LocalData = Backbone.Model.extend({
 		this.getCountryData();
 		this.on('change:fpm',this.calcFP);
 		this.on('change:current_diet',this.calcFP);
+		this.on('change:current_diet',this.calcNutrition);
 		this.calcFP();
 		this.jalavaScenarios();
 		this.on('change:prot_per_gram',this.jalavaScenarios);
@@ -88,6 +89,15 @@ var LocalData = Backbone.Model.extend({
 			function(pieces){if(pieces[1]>0){return pieces[0]/pieces[1]} else {return 0}}));
 		this.set('fat_per_gram',_.map(_.zip(this.get('current_fat'),this.get('current_diet')),
 			function(pieces){if(pieces[1]>0){return pieces[0]/pieces[1]} else {return 0}}));
+	},
+	calcNutrition:function(){
+		if(!this.get('kcal_per_gram')) return this;
+		if(!this.get('prot_per_gram')) return this;
+		if(!this.get('fat_per_gram')) return this;
+		this.set('current_prot',prod(this.get('current_diet'),this.get('prot_per_gram')));
+		this.set('current_fat',prod(this.get('current_diet'),this.get('fat_per_gram')));
+		this.set('current_kcal',prod(this.get('current_diet'),this.get('kcal_per_gram')));
+		return this;
 	},
 	calcFP:function(){
 		var x=[prod(this.get('current_diet'),this.get('fpm')[0])].concat(
