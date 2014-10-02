@@ -589,3 +589,52 @@ var SelectCountry = Backbone.View.extend({
 		this.$el.find("select").val(this.model.get('user_country'));
 	}
 });
+
+var ListObjectives = Backbone.View.extend({
+    initialize: function(args){
+		this.tpl=_.template($("#ListObjectives_template").html());
+		this.listenTo(this.model,'change:ader',this.render,this);
+		this.listenTo(this.model,'change:user_prot_perc',this.render,this);
+		this.listenTo(this.model,'change:user_fat_perc',this.render,this);
+		this.listenTo(this.model,'change:user_vegmin',this.render,this);
+		this.listenTo(this.model,'change:user_meatprodprotub',this.render,this);
+		this.listenTo(this.model,'change:user_meatprotub',this.render,this);
+		this.listenTo(this.model,'change:current_diet',this.render,this);
+		this.render();
+	},
+	render:function(){
+		if(!this.model.get('current_kcal')) return this;
+		if(!this.model.get('current_prot')) return this;
+		if(!this.model.get('current_fat')) return this;
+		if(!this.model.get('current_diet')) return this;
+		
+		// Calculation of percentage energy intake
+		kcal_total=sum(this.model.get('current_kcal'));
+		kcal_perc=_.map(kcal,function(num){return num/kcal_total;});
+		
+		// Calculation of percentage protein intake
+		prot_total=sum(this.model.get('current_prot'));
+		prot_perc=_.map(prot,function(num){return num/prot_total;});
+		
+		//Calculation of total fat in grams
+		fat_total=sum(this.model.get('current_fat'));
+		fat_perc=_.map(fat,function(num){return num/fat_total;});
+
+		this.$el.html(this.tpl({
+			diet:this.model.get('current_diet'),	
+			kcal_perc:kcal_perc,
+			prot_perc:prot_perc,
+			fat_perc:fat_perc,
+			kcal_total:kcal_total,			
+			kcal_prot:prot_total*4, //4 is conversion from grams to energy
+			kcal_fat:fat_total*9, //9 is conversion from grams to energy
+			ader:this.model.get('ader'),
+			user_prot_perc:this.model.get("user_prot_perc"),
+			user_fat_perc:this.model.get("user_fat_perc"),
+			user_vegmin:this.model.get("user_vegmin"),
+			user_meatprodprotub:this.model.get("user_meatprodprotub"),
+			user_meatprotub:this.model.get("user_meatprotub"),
+			footprints_totals:this.model.get('footprints_totals'),
+		}));
+	}
+});
