@@ -17,7 +17,7 @@ var product_names = ["beverages","cereals","eggs","fish","fruits&vegs","meat","m
 // Diet or CountryDiet instead?
 var LocalData = Backbone.Model.extend({
 	defaults:{
-		footprints:[NaN,NaN],
+		footprints_totals:[NaN,NaN],
 		current_diet:[NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN],
 		// set by constrainDiet
 		user_constrained_diet:[NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN,NaN],
@@ -33,9 +33,10 @@ var LocalData = Backbone.Model.extend({
 		this.gc=args.gc;
 		this.listenTo(this.gc,'change:user_country',this.getCountryData,this);
 		//this.listenTo(this.gc,'change:ready',this.getCountryData,this);
-		this.on('change:fpm',this.calcFP);
 		this.getCountryData();
-		//this.calcFP();
+		this.on('change:fpm',this.calcFP);
+		this.on('change:current_diet',this.calcFP);
+		this.calcFP();
 		this.jalavaScenarios();
 		this.on('change:prot_per_gram',this.jalavaScenarios);
 		this.on('change:fat_per_gram',this.jalavaScenarios);
@@ -89,9 +90,11 @@ var LocalData = Backbone.Model.extend({
 			function(pieces){if(pieces[1]>0){return pieces[0]/pieces[1]} else {return 0}}));
 	},
 	calcFP:function(){
-		this.set('footprints',
-			[sum(prod(this.get('current_diet'),this.get('fpm')[0]))].concat(
-			[sum(prod(this.get('current_diet'),this.get('fpm')[1]))]));
+		var x=[prod(this.get('current_diet'),this.get('fpm')[0])].concat(
+			[prod(this.get('current_diet'),this.get('fpm')[1])]);
+		//x=x.concat([add(x[0],x[1])]); //Sum
+		this.set('footprints',x);
+		this.set('footprints_totals',_.map(this.get('footprints'),function(x){return sum(x)}));
 		//var model=this;
 		// var req=ocpu.rpc('diet_footprint',{
 				// diet:model.get('current_diet'),
@@ -220,12 +223,12 @@ var GlobalContext = Backbone.Model.extend({
 
 var Footprint = Backbone.View.extend({
     initialize: function(args){
-		this.listenTo(this.model,'change:footprints',this.render,this);
+		this.listenTo(this.model,'change:footprints_totals',this.render,this);
 		this.render();
 	},
 	render:function(){
-		this.$el.find("span.blue").html(this.model.get('footprints')[0].toFixed(2));
-		this.$el.find("span.green").html(this.model.get('footprints')[1].toFixed(2));
+		this.$el.find("span.blue").html(this.model.get('footprints_totals')[0].toFixed(2));
+		this.$el.find("span.green").html(this.model.get('footprints_totals')[1].toFixed(2));
 	}
 });
 
