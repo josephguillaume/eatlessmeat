@@ -369,6 +369,82 @@ var BarplotProducts = Backbone.View.extend({
 	}
 });
 
+var DraggableBarplotProducts = Backbone.View.extend({
+	initialize: function(args){	
+		this.height=args.height;
+		this.main=args.main;
+		this.legend_text=args.legend_text;
+		this.seriesColors=args.seriesColors;
+		this.yaxis_label=args.yaxis_label;
+		this.listenTo(this.model,'change:'+this.height,this.render,this);
+		this.create();
+	},
+	create:function(){
+		var pn=product_names.slice(0);
+		pn.splice(9,1);
+
+        $.jqplot.config.enablePlugins = true;
+ 
+		//data is array of arrays of each series
+		var y=this.model.get(this.height);
+		if(!Array.isArray(y[0])) y=[y];
+
+		var opts = {
+			stackSeries:true,
+            animate: false,
+            seriesDefaults:{
+                renderer:$.jqplot.BarRenderer,
+                pointLabels: { show: true }
+            },
+            axes: {
+                xaxis: {
+                    renderer: $.jqplot.CategoryAxisRenderer,
+					tickRenderer:$.jqplot.CanvasAxisTickRenderer,
+					tickOptions:{
+						angle:-60,
+					},		
+                    ticks: pn
+                }
+            },
+            highlighter: { show: true, tooltipContentEditor:tooltipContentEditor }
+        };
+		if(this.legend_text) opts["series"]=_.map(this.legend_text,function(x){return {
+			label:x,				
+			dragable:{
+				color: undefined,
+				constrainTo:'y'
+			},
+			isDragable: true
+		}});
+		if(this.seriesColors) opts["seriesColors"]=this.seriesColors;
+		if(this.yaxis_label) opts["axes"]["yaxis"]={label:this.yaxis_label,labelRenderer: $.jqplot.CanvasAxisLabelRenderer};
+
+        this.plot = $.jqplot(this.$el.attr('id'), y, opts);
+
+		function tooltipContentEditor(str, seriesIndex, pointIndex, plot) {
+			// display series_label, x-axis_tick, y-axis value
+			return plot.series[seriesIndex]["label"] + ", " + plot.data[seriesIndex][pointIndex].toFixed(2);
+		}
+		
+		var view=this;
+		view.$el.on('jqplotDragStop',function(seriesIndex, pointIndex, pixelposition, data){
+				view.model.set(view.height,_.map(view.plot.series[0].data,function(x){return x[1]}))
+			});
+		
+		return this;
+	},
+	render:function(){
+		if(!this.plot){
+			this.create();
+			return this;
+		}
+	    this.plot.series[0].data = _.map(this.model.get(this.height),function(x,i){return [i+1,x]});
+        //this.plot.resetAxesScale();
+        this.plot.replot();
+		return this;
+	}
+});  
+
 var Barplot = Backbone.View.extend({
 	initialize: function(args){
 		this.height=args.height;
