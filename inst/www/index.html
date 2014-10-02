@@ -19,6 +19,16 @@
 	<script type="text/javascript" src="js/data.js"></script>
 	<script type="text/javascript" src="js/models.js"></script>
 
+  <script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/jquery.jqplot.js"></script>    
+	<link rel="stylesheet" type="text/css" href="http://cdn.jsdelivr.net/jqplot/1.0.8/jquery.jqplot.css">
+	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.barRenderer.min.js""></script> 
+	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.categoryAxisRenderer.min.js"></script> 
+	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.dragable.js"></script> 
+	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.highlighter.js"></script> 
+	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.canvasTextRenderer.min.js"></script>
+	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
+
 	<style>
 	.barplot {height:400px}
 
@@ -458,9 +468,12 @@ tuserdiet = new TableDiet({model:ld,el:$("#table_user_diet"),diet:'user_constrai
 constr = new TableConstraints({model:ld,el:$("#constraints_applied")});
 constr2 = new TableConstraints({model:ld,el:$("#constraints_applied2")});
 
-//cc = new DropdownCountry({model:gc,el:$("#choose_country")});
+//bp_food= new BarplotProducts({model:ld,el:$("#bp_current_diet"),height:'current_diet',main:'Food supply for current diet (g/cap/day)'});
+//$("#collapse2").on('shown.bs.collapse',function(x){bp_food.render();});
 
-bp_food= new BarplotProducts({model:ld,el:$("#bp_current_diet"),height:'current_diet',main:'Food supply for current diet (g/cap/day)'});
+var bp_food= new DraggableBarplotProducts({model:ld,el:$("#bp_current_diet"),height:'current_diet',main:'Food supply for current diet (g/cap/day)',
+  legend_text:['g/cap/day'],seriesColors:["#FFFF66"],yaxis_label:"Food supply (g/cap/day)"
+});
 $("#collapse2").on('shown.bs.collapse',function(x){bp_food.render();});
 
 scen_names=['Current','Scen 1','Scen 2','Scen 3','Scen 4'];
