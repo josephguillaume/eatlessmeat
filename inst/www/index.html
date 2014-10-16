@@ -64,6 +64,10 @@
 	.carousel-indicators .active {
 		background-color: grey;
 	}
+	
+	#scens_legend li {
+		margin: 0 0 5px 0;
+	}
 	</style>
 
 </head>
@@ -83,6 +87,14 @@
 	</div>
 
 	<div class="row">
+	The graph below shows the water saved by replacing meat with other food products, while maintaining a balanced diet. 
+	The water saved is negative if the water used is increased.
+	<br/>
+	Food products can be produced so they are rain-fed (which we call <b>Green</b> water) or by irrigation (called <b>Blue</b> water). 
+	The water footprints also include harvest losses, wasted food and the (blue) water used for processing.
+	</div>
+	
+	<div class="row spacer">
 
 		<div id="jalava_carousel" class="carousel col-md-8" data-ride="carousel" data-interval='false'>
 			 <!-- Indicators -->
@@ -112,12 +124,16 @@
 			</a> 
 		</div>
 		
-		<ul>
-		<li>Scenario 1: meet recommended dietary requirements</li>
-		<li>Scenario 2: max 50% protein from meat products, 16.7% protein from meat</li>
-		<li>Scenario 3: max 25% protein from meat products, 8.3% protein from meat</li>
-		<li>Scenario 4: max 12.5% protein from meat products, 4.17% protein from meat</li>
+		<div class="col-md-4">
+		Five diets or scenarios are shown:<p/>
+		<ul id=scens_legend>
+		<li>Current diet. This is by default an average for the selected country</li>
+		<li>Scenario 1: a diet that meets recommended dietary requirements</li>
+		<li>Scenario 2: a diet with a maximum of 50% of protein from meat products, and a maximum of 16.7% of protein from meat</li>
+		<li>Scenario 3: a diet with a maximum of 25% of protein from meat products, and a maximum of 8.3% of protein from meat</li>
+		<li>Scenario 4: a diet with a maximum of 12.5% of protein from meat products, and a maximum of 4.17% of protein from meat</li>
 		</ul>
+		</div>
 		
 		<!-- TODO: some kind of text summary
 		Yes/No</br>
