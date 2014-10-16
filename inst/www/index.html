@@ -29,6 +29,9 @@
 	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
 	<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
 
+	<link href="bootstrap3-editable-1.5.1/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
+	<script src="bootstrap3-editable-1.5.1/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+	
 	<style>
 	.barplot {height:400px}
 
@@ -196,7 +199,7 @@
 			<li>Food could be imported/exported from different countries</li>
 			
 			<br/>
-			Current food group water footprints ML/year/gram:
+			Current food group water footprints ML/kilogram (click underlined numbers to edit):
 			<div id="fpmatrix"><!--Per food group footprints --></div>
 		</div></div>
 	  </div>
@@ -332,21 +335,21 @@
 			<tbody>
 				<tr align="right">
 				<td>Blue water footprint</td>
-				<!-- ML/year/gram-->
-				<% _.each( fpm[0], function( cell ){ %>
-					<td align="right"><%- cell.toFixed(3) %></td>
+				<!-- ML/kilogram-->
+				<% _.each( fpm[0], function( cell, i ){ %>
+					<td align="right"><span  class=xeditable data-name="fpm_0_<%-i%>" data-type="text" data-title='Enter blue water footprint (ML/kg)'><%- (cell*1000).toFixed(3) %></span></td>
 				<% }); %>
 				</tr>
 				<tr align="right">
 				<td>Green water footprint</td>
-				<% _.each( fpm[1], function( cell ){ %>
-					<td align="right"><%- cell.toFixed(3) %></td>
+				<% _.each( fpm[1], function( cell, i ){ %>
+					<td align="right"><span  class=xeditable data-name="fpm_1_<%-i%>" data-type="text" data-title='Enter green water footprint (ML/kg)'><%- (cell*1000).toFixed(3) %></span></td>
 				<% }); %>
 				</tr>
 				<tr align="right">
 				<td>Total water footprint</td>
 				<% _.each( add(fpm[0],fpm[1]), function( cell ){ %>
-					<td align="right"><%- cell.toFixed(3) %></td>
+					<td align="right"><%- (cell*1000).toFixed(3) %></td>
 				<% }); %>
 				</tr>
 			</tbody>

@@ -249,9 +249,22 @@ var TableFPMatrix = Backbone.View.extend({
 		this.render();
 	},
 	render:function(){
+		this.$el.find(".xeditable").editable('destroy')
 		this.$el.html(_.template($("#TableFPMatrix_template").html(),{
 			fpm:this.model.get("fpm")
 		}));
+		var model=this.model;
+		this.$el.find(".xeditable").editable({
+			unsavedclass:null,
+		    success: function(response, newValue) {
+				var fpm = _.map(model.get('fpm'),function(x){return x.slice()});
+				var name = $(this).data('name');
+				var w = parseInt(name.replace('fpm_','').replace(/_.*/,''));
+				var i = parseInt(name.replace(/fpm_.*_/,''));
+				fpm[w][i]=newValue/1000.0
+				model.set('fpm',fpm);
+			}})
+		return this;
 	}
 });
 
@@ -538,6 +551,7 @@ var BarplotFootprint = Backbone.View.extend({
 	initialize: function(args){
 		this.dirty=true;
 		this.listenTo(this.model,'change:jalava_scens',this.actual_render,this);
+		this.listenTo(this.model,'change:fpm',this.actual_render,this);
 		this.actual_render();
 	},
 	render:function(){
