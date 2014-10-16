@@ -259,7 +259,7 @@
 			<li>Nutritional requirements may be to some extent uncertain</li>
 			<br/>
 
-			Current dietary requirements imposed:<br/>
+			Current dietary requirements imposed (click underlined numbers to edit):<br/>
 			<div id="constraints_applied2" class="well"></div>
 			
 			<div class="spacer">
@@ -428,15 +428,11 @@
 
 <script type="text/template" id="TableConstraints_template">
    Nutrition constraints:
-   <li>Average dietary energy intake must be <b><%- ader %> kcal/cap/day</b>.</li>
-   <li>Protein intake must be between <b><%- user_prot_perc[0]*100 %>%</b> and <b><%- user_prot_perc[1]*100 %>%</b> of daily energy intake</li>
-   <li>Fat intake must be between <b><%- user_fat_perc[0]*100 %>%</b> and <b><%- user_fat_perc[1]*100 %>%</b> of daily energy intake</li>
-   <li>Vegetable intake is at least <b><%- user_vegmin %> grams per day</b> (this include vegetable, fruit and oilseeds)</li>
+   <li>Average dietary energy intake must be <b><span class=xeditable data-name="ader" data-type="text" data-title='Enter target ADER kcal/cap/day'><%- ader %></span> kcal/cap/day</b>.</li>
+   <li>Protein intake must be between <b><span class=xeditable data-name="user_prot_perc_0" data-type="text" data-title='Enter minimum protein intake (%)'><%- user_prot_perc[0]*100 %></span>%</b> and <b><span class=xeditable data-name="user_prot_perc_1" data-type="text" data-title='Enter maximum protein intake (%)'><%- user_prot_perc[1]*100 %></span>%</b> of daily energy intake</li>
+   <li>Fat intake must be between <b><span class=xeditable data-name="user_fat_perc_0" data-type="text" data-title='Enter minimum fat intake (%)'><%- user_fat_perc[0]*100 %></span>%</b> and <b><span class=xeditable data-name="user_fat_perc_1" data-type="text" data-title='Enter maximum fat intake (%)'><%- user_fat_perc[1]*100 %></span>%</b> of daily energy intake</li>
+   <li>Vegetable intake is at least <b><span class=xeditable data-name="user_vegmin" data-type="text" data-title='Enter minimum vegetable intake (grams/day)'><%- user_vegmin %></span> grams per day</b> (this include vegetable, fruit and oilseeds)</li>
    <li>Sugar intake should be less than 10% of of daily energy intake</li>
-   <br/>
-   Meat reduction:
-   <li>Meat makes up less than <b><%- user_meatprotub*100 %>%</b> of total protein intake</li>
-   <li>Meat products (eggs, meat, milk) make up less than <b><%- user_meatprodprotub*100 %>%</b> of total protein intake</li>
    <br/>
    Additional constraints in changing diet:
    <li>Beverages, spices and stimulants should not increase</li>

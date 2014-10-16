@@ -330,6 +330,7 @@ var TableConstraints = Backbone.View.extend({
 		this.render();
 	},
 	render:function(){
+		this.$el.find(".xeditable").editable('destroy');
 		this.$el.html(_.template($("#TableConstraints_template").html(),{
 			ader:this.model.get('ader'),
 			user_prot_perc:this.model.get("user_prot_perc"),
@@ -338,6 +339,37 @@ var TableConstraints = Backbone.View.extend({
 			user_meatprodprotub:this.model.get("user_meatprodprotub"),
 			user_meatprotub:this.model.get("user_meatprotub"),
 		}));
+		var model=this.model;
+		this.$el.find(".xeditable").editable({
+			unsavedclass:null,
+		    success: function(response, newValue) {
+				var name = $(this).data('name');
+				if(name=='ader') model.set('ader',parseFloat(newValue));
+				if(name=='user_prot_perc_0'){
+					var user_prot_perc=model.get('user_prot_perc').slice()
+					user_prot_perc[0]=parseFloat(newValue)/100.0
+					model.set('user_prot_perc',user_prot_perc);
+				}
+				if(name=='user_prot_perc_1'){
+					var user_prot_perc=model.get('user_prot_perc').slice()
+					user_prot_perc[1]=parseFloat(newValue)/100.0
+					model.set('user_prot_perc',user_prot_perc);
+				}
+				if(name=='user_fat_perc_0'){
+					var user_fat_perc=model.get('user_fat_perc').slice()
+					user_fat_perc[0]=parseFloat(newValue)/100.0
+					model.set('user_fat_perc',user_fat_perc);
+				}
+				if(name=='user_fat_perc_1'){
+					var user_fat_perc=model.get('user_fat_perc').slice()
+					user_fat_perc[1]=parseFloat(newValue)/100.0
+					model.set('user_fat_perc',user_fat_perc);
+				}
+				if(name=='user_vegmin') model.set('user_vegmin',parseFloat(newValue));
+				if(name=='user_meatprotub') model.set('user_meatprotub',parseFloat(newValue)/100.0);
+				if(name=='user_meatprodprotub') model.set('user_meatprodprotub',parseFloat(newValue)/100.0);
+			}});
+		return this;
 	}
 });
 
