@@ -436,6 +436,8 @@ var DraggableBarplotProducts = Backbone.View.extend({
 		this.create();
 	},
 	create:function(){
+		if(!this.$el.is(":visible")) return this;
+		
 		var pn=product_names.slice(0);
 		pn.splice(9,1);
 
