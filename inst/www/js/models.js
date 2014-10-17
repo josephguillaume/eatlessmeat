@@ -301,6 +301,7 @@ var TableDiet = Backbone.View.extend({
 		fat_total=sum(fat);
 		fat_perc=_.map(fat,function(num){return num/fat_total;});
 
+		this.$el.find(".xeditable").editable('destroy')
 		this.$el.html(_.template($("#TableDiet_template").html(),{
 			diet:this.model.get(this.diet),	
 			kcal_perc:kcal_perc,
@@ -314,6 +315,16 @@ var TableDiet = Backbone.View.extend({
 			kcal_prot:prot_total*4, //4 is conversion from grams to energy
 			kcal_fat:fat_total*9 //9 is conversion from grams to energy
 		}));
+		var model=this.model;
+		this.$el.find(".xeditable").editable({
+			unsavedclass:null,
+		    success: function(response, newValue) {
+				var name = $(this).data('name');
+				var i = parseInt(name.replace(/grams_/,''));
+				var current_diet = model.get('current_diet').slice();
+				current_diet[i]=parseFloat(newValue);
+				model.set('current_diet',current_diet);
+			}})
 		return this;
 	}
 });

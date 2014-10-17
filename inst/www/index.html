@@ -235,7 +235,7 @@
 			<li>Diets vary substantially within countries</li>
 			<br/>
 			
-			The current diet is:<br/>
+			The current diet is (click underlined numbers to edit):<br/>
 			<div id="table_current_diet"></div>
 			
 			<div class=row><div id="bp_current_diet" class="col-md-8 barplot"></div></div>
@@ -395,8 +395,8 @@
 			<tbody>
 				<tr align="right">
 				<td>Grams per person per day</td>
-				<% _.each( diet, function( cell ){ %>
-					<td align="right"><%- cell.toFixed(2) %></td>
+				<% _.each( diet, function( cell, i ){ %>
+					<td align="right"><span  class=xeditable data-name="grams_<%-i%>" data-type="text" data-title='Enter quantity consumed (grams)'><%- cell.toFixed(2) %></span></td>
 				<% }); %>
 				<td><%- sum(diet).toFixed(2) %></td>
 				</tr>
