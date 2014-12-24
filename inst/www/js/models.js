@@ -100,6 +100,8 @@ var LocalData = Backbone.Model.extend({
 		return this;
 	},
 	calcFP:function(){
+		if(!this.get('current_diet')) return this;
+		if(!this.get('fpm')) return this;
 		var x=[prod(this.get('current_diet'),this.get('fpm')[0])].concat(
 			[prod(this.get('current_diet'),this.get('fpm')[1])]);
 		//x=x.concat([add(x[0],x[1])]); //Sum
@@ -150,6 +152,11 @@ var LocalData = Backbone.Model.extend({
 	jalavaScenarios:function(){
 		var model=this;
 		if(!model.get('current_diet')) return this;
+		if(!model.get('current_diet')[0]) return this;
+		if(!model.get('ader')) return this;
+		if(!model.get('kcal_per_gram')) return this;
+		if(!model.get('prot_per_gram')) return this;
+		if(!model.get('fat_per_gram')) return this;
 		var req=ocpu.rpc('jalava_scenarios',{
 			current_diet:model.get('current_diet'),
 			ader:model.get('ader'),
@@ -181,16 +188,16 @@ var GlobalContext = Backbone.Model.extend({
 	initialize:function(){
 		//this.loadCountries();
 		//this.getAllData();
-		//this.getUserCountryIPinfo(); //should be only when it is ready
-		this.set('user_country',"Finland");
-		//this.set('user_country',"Switzerland");
+		this.getUserCountryIPinfo(); //should be only when data is ready
+		//this.set('user_country',"Finland");
 	},
 	getUserCountryIPinfo:function(){
 		var model=this;
 		//http://stackoverflow.com/questions/3489460/how-to-get-visitors-location-i-e-country-using-javascript-geolocation 
-		var req=$.get("http://ipinfo.io", function (response) {
-			console.log(JSON.stringify(response, null, 4));
-			model.set('user_country',response.country);
+		//country codes from http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip
+		var req=$.get("http://ipinfo.io/geo", function (response) {
+			//console.log(JSON.stringify(response, null, 4));
+			model.set('user_country',countries[iso3166.indexOf(response.country)]);
 		}, "jsonp");
 		//TODO: what should default be?
 		req.fail(function(){model.set('user_country',"Finland")});
@@ -249,6 +256,7 @@ var TableFPMatrix = Backbone.View.extend({
 		this.render();
 	},
 	render:function(){
+		if(!this.model.get('fpm')) return this;
 		this.$el.find(".xeditable").editable('destroy')
 		this.$el.html(_.template($("#TableFPMatrix_template").html(),{
 			fpm:this.model.get("fpm")
@@ -285,6 +293,9 @@ var TableDiet = Backbone.View.extend({
 		if(!this.model.get('current_prot')) return this;
 		if(!this.model.get('current_fat')) return this;
 		if(!this.model.get('current_diet')) return this;
+		if(!this.model.get('kcal_per_gram')) return this;
+		if(!this.model.get('prot_per_gram')) return this;
+		if(!this.model.get('fat_per_gram')) return this;
 		
 		// Calculation of percentage energy intake
 		kcal=prod(this.model.get(this.diet),this.model.get('kcal_per_gram'));
